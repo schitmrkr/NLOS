@@ -12,12 +12,12 @@ section .multiboot
 ; ===== Code Section =====
 
 section .text
-global _start
+    global _start
 
-_start:
-    ; Call kmain()
-    extern kmain
-    call kmain
+    _start:
+        ; Call kmain()
+        extern kmain
+        call kmain
 
-.hang:
-    jmp .hang
+    .hang:
+        jmp .hang
