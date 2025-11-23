@@ -1,30 +1,26 @@
 CC = x86_64-elf-gcc
 LD = x86_64-elf-ld
-CFLAGS = -ffreestanding -O2 -Wall -Wextra
-LDFLAGS = -T kernel/link.ld -nostdlib
+AS = nasm
 
-all: run
+CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32
+LDFLAGS = -m elf_i386
 
-build:
-	mkdir -p build
+all: kernel.elf
 
-build/kernel.o: build kernel/kernel.c
-	$(CC) $(CFLAGS) -c kernel/kernel.c -o build/kernel.o
+kernel.elf: boot.o kernel.o vga.o
+	$(LD) $(LDFLAGS) -T linker.ld -o kernel.elf boot.o kernel.o vga.o
 
-build/boot.o: build kernel/boot.s
-	nasm -f elf64 kernel/boot.s -o build/boot.o
+boot.o: boot/boot.s
+	$(AS) -f elf32 boot/boot.s -o boot.o
 
-build/kernel.elf: build/kernel.o build/boot.o
-	$(LD) $(LDFLAGS) -o build/kernel.elf build/kernel.o build/boot.o
+kernel.o: kernel/kernel.c
+	$(CC) $(CFLAGS) -c kernel/kernel.c -o kernel.o
 
-iso: build/kernel.elf
-	mkdir -p iso/boot/grub
-	cp build/kernel.elf iso/boot/
-	cp grub/grub.cfg iso/boot/grub/
-	x86_64-elf-grub-mkrescue -o nlos.iso iso
+vga.o: kernel/vga.c
+	$(CC) $(CFLAGS) -c kernel/vga.c -o vga.o
 
-run: iso
-	qemu-system-x86_64 -cdrom nlos.iso
+run: kernel.elf
+	qemu-system-i386 -kernel kernel.elf
 
 clean:
-	rm -rf build iso nlos.iso
+	rm -f *.o *.elf
