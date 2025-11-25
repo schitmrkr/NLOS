@@ -1,8 +1,21 @@
 #include "vga.h"
 
-void kmain() {
+void kmain(void) {
+  uint8_t cyan_on_blue = vga_make_color(VGA_LIGHT_CYAN, VGA_BLUE);
+  uint8_t yellow_on_black = vga_make_color(VGA_LIGHT_BROWN, VGA_BLACK);
+
+  vga_set_color(cyan_on_blue);
   vga_clear();
-  print("Hello QEMU!\n");
+
+  vga_print_color("Kernel Step 10: Colors & Scrolling\n", cyan_on_blue);
+  vga_print_color("Line 1\n", yellow_on_black);
+  vga_print_color("Line 2\n", yellow_on_black);
+  vga_print_color("Line 3\n", yellow_on_black);
+
+  /* Scroll Effect Demo */
+  for (int i = 0; i < 23; i++) {
+    vga_print_color("Test scrolling.. \n", yellow_on_black);
+  }
   while (1) {
   }
 }
