@@ -1,8 +1,22 @@
+# Compiler
 CC = x86_64-elf-gcc
+
+# Linker
 LD = x86_64-elf-ld
+
+# Assembler
 AS = nasm
 
+# Compiler flags
+# -ffreestanding: The code does not use the standard C library
+# -fno-stack-protector: Disable stack protection
+# -nostdlib: Do not link against the standard C library
+# -m32: Generate 32-bit code
+# -g: Generate debug information
 CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32 -g
+
+# Linker flags
+# -m elf_i386: Generate 32-bit ELF
 LDFLAGS = -m elf_i386
 
 KERNEL_SRC = kernel/kernel.c kernel/vga.c kernel/utils.c
