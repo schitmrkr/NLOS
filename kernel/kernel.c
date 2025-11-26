@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "vga.h"
 
 void kmain(void) {
@@ -12,10 +13,12 @@ void kmain(void) {
   vga_print_color("Line 2\n", yellow_on_black);
   vga_print_color("Line 3\n", yellow_on_black);
 
-  /* Scroll Effect Demo */
-  for (int i = 0; i < 23; i++) {
-    vga_print_color("Test scrolling.. \n", yellow_on_black);
-  }
+  char buf[12];
+  itoa(1234, buf);
+
+  vga_print(buf);
+  vga_print("\n");
+
   while (1) {
   }
 }
