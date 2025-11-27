@@ -35,6 +35,37 @@ void itoa(int n, char *buf) {
   buf[i] = '\0';
 }
 
+/* Integer to hex string */
+void itox(unsigned int n, char *buf) {
+  int i = 0;
+  if (n == 0) {
+    buf[i++] = '0';
+    buf[i] = '\0';
+    return;
+  }
+
+  char temp[9]; // Max 8 hex digits for 32 bits
+  int j = 0;
+  while (n > 0) {
+    unsigned int digit =
+        n & 0xF; // This operation is equivalent to n AND 0000 1111
+    if (digit < 10)
+      temp[j++] = '0' + digit;
+    else
+      temp[j++] = 'A' + (digit - 10);
+    // Shift the n to right by 4 bits
+    // n = n / 16   (integer division)
+    // 0011 1010 1111   (before)
+    // 0000 0011 1010   (after shift)
+    n >>= 4;
+  }
+
+  while (j > 0) {
+    buf[i++] = temp[--j];
+  }
+  buf[i] = '\0';
+}
+
 int strlen(const char *s) {
   int len = 0;
   while (s[len])

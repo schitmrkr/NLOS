@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 void itoa(int n, char *buf);
+void itox(unsigned int n, char *buf);
 int strlen(const char *s);
 
 void *memset(void *ptr, uint8_t value, int num);

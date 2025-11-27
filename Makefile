@@ -19,7 +19,7 @@ CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32 -g
 # -m elf_i386: Generate 32-bit ELF
 LDFLAGS = -m elf_i386
 
-KERNEL_SRC = kernel/kernel.c kernel/vga.c kernel/utils.c
+KERNEL_SRC = kernel/kernel.c kernel/vga.c kernel/utils.c kernel/print.c
 KERNEL_OBJS = $(KERNEL_SRC:.c=.o)
 
 all: kernel.elf

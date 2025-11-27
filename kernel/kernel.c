@@ -1,3 +1,4 @@
+#include "print.h"
 #include "utils.h"
 #include "vga.h"
 
@@ -18,6 +19,8 @@ void kmain(void) {
 
   vga_print(buf);
   vga_print("\n");
+
+  kprintf("%d\n", 1234);
 
   while (1) {
   }
