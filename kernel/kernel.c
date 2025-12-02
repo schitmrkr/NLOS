@@ -1,6 +1,6 @@
-#include "print.h"
-#include "utils.h"
-#include "vga.h"
+#include "../include/print.h"
+#include "../include/utils.h"
+#include "../include/vga.h"
 
 void kmain(void) {
   uint8_t cyan_on_blue = vga_make_color(VGA_LIGHT_CYAN, VGA_BLUE);

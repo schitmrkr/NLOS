@@ -1,5 +1,5 @@
 # Compiler
-CC = x86_64-elf-gcc
+CC = x86_64-elf-gcc  # Using your existing cross-compiler
 
 # Linker
 LD = x86_64-elf-ld
@@ -19,15 +19,18 @@ CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32 -g
 # -m elf_i386: Generate 32-bit ELF
 LDFLAGS = -m elf_i386
 
-KERNEL_SRC = kernel/kernel.c kernel/vga.c kernel/utils.c kernel/print.c
+# Kernel source files
+KERNEL_SRC = kernel/kernel.c kernel/arch/x86/io.c kernel/vga.c kernel/utils.c kernel/print.c
 KERNEL_OBJS = $(KERNEL_SRC:.c=.o)
 
+# Default target
 all: kernel.elf
 
+# Link kernel with bootloader
 kernel.elf: boot.o $(KERNEL_OBJS)
 	$(LD) $(LDFLAGS) -T linker.ld -o kernel.elf boot.o $(KERNEL_OBJS)
 
-# Assemble bootloader
+# Assemble bootloader as 32-bit ELF
 boot.o: boot/boot.s
 	$(AS) -f elf32 boot/boot.s -o boot.o
 
@@ -35,10 +38,10 @@ boot.o: boot/boot.s
 kernel/%.o: kernel/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Run in QEMU
+# Run in QEMU (32-bit)
 run: kernel.elf
-	qemu-system-i386 -kernel kernel.elf
+	qemu-system-i386 -kernel kernel.elf -m 512M -serial stdio
 
 # Clean build artifacts
 clean:
-	rm -f *.o *.elf kernel/*.o
+	rm -f *.o */arch/x86/*.o *.elf kernel/*.o

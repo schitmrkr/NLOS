@@ -1,6 +1,6 @@
-#include "print.h"
-#include "utils.h"
-#include "vga.h"
+#include "../include/print.h"
+#include "../include/utils.h"
+#include "../include/vga.h"
 #include <stdarg.h>
 
 void kprintf(const char *fmt, ...) {
