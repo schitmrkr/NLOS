@@ -19,16 +19,16 @@ CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32 -g
 # -m elf_i386: Generate 32-bit ELF
 LDFLAGS = -m elf_i386
 
-# Kernel source files
-KERNEL_SRC = kernel/kernel.c kernel/arch/x86/io.c kernel/vga.c kernel/utils.c kernel/print.c drivers/keyboard.c
+# Kernel source files (including architecture-specific code and drivers)
+KERNEL_SRC = kernel/kernel.c kernel/arch/x86/idt.c kernel/arch/x86/interrupts.c drivers/keyboard.c drivers/vga.c kernel/utils.c kernel/print.c
 KERNEL_OBJS = $(KERNEL_SRC:.c=.o)
 
 # Default target
 all: kernel.elf
 
-# Link kernel with bootloader
-kernel.elf: boot.o $(KERNEL_OBJS)
-	$(LD) $(LDFLAGS) -T linker.ld -o kernel.elf boot.o $(KERNEL_OBJS)
+# Link kernel with bootloader and keyboard ISR object
+kernel.elf: boot.o $(KERNEL_OBJS) drivers/keyboard_isr.o kernel/arch/x86/idt_load.o
+	$(LD) $(LDFLAGS) -T linker.ld -o kernel.elf boot.o $(KERNEL_OBJS) drivers/keyboard_isr.o kernel/arch/x86/idt_load.o
 
 # Assemble bootloader as 32-bit ELF
 boot.o: boot/boot.s
@@ -38,9 +38,21 @@ boot.o: boot/boot.s
 kernel/%.o: kernel/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Compile architecture-specific C files
+kernel/arch/x86/%.o: kernel/arch/x86/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Compile driver C files
 drivers/%.o: drivers/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Assemble driver assembly files (keyboard ISR)
+drivers/keyboard_isr.o: drivers/keyboard_isr.s
+	$(AS) -f elf32 $< -o $@
+
+# Assemble IDT load routine
+kernel/arch/x86/idt_load.o: kernel/arch/x86/idt_load.s
+	$(AS) -f elf32 $< -o $@
 
 # Run in QEMU (32-bit)
 run: kernel.elf

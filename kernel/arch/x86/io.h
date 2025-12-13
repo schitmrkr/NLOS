@@ -25,4 +25,15 @@ static inline void outb(uint16_t port, uint8_t val) {
   __asm__ __volatile__("outb %0, %1" : : "a"(val), "dN"(port));
 }
 
+// New interrupt control
+// Equivalent to following assembly code:
+// sti
+// sti is a no-op if interrupts are already enabled
+static inline void enable_interrupts() { __asm__ __volatile__("sti"); }
+
+// Equivalent to following assembly code:
+// cli
+// cli is a no-op if interrupts are already disabled
+static inline void disable_interrupts() { __asm__ __volatile__("cli"); }
+
 #endif

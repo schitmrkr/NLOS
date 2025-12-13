@@ -1,26 +1,32 @@
+#include "keyboard.h"
 #include "../kernel/arch/x86/io.h"
 
-#include <stdint.h>
+static char buffer[256];
+static int head = 0, tail = 0;
 
-// Maps 128 possible PS/2 keyboard scancodes (0x00 - 0x7F) to ascii characters
 char scancode_to_ascii[128] = {
-    0,    27,   '1',  '2', '3', '4', '5', '6', '7', '8', '9',  '0', '-',
-    '=',  '\b', '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i',  'o', 'p',
-    '[',  ']',  '\n', 0, /* 0x0F */
-    'a',  's',  'd',  'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0,
-    '\\', 'z',  'x',  'c', 'v', 'b', 'n', 'm', ',', '.', '/',  0,   '*',
-    0,    ' ',  0,    0,   0,   0,   0,   0,   0,   0,   0};
+    0,    27,   '1', '2',  '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
+    '\b', '\t', 'q', 'w',  'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
+    '\n', 0,    0,   0,    0,   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+    ';',  '`',  0,   '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+    0,    0,    0,   0,    ' ', 0,   0,   0,   0,   0,   0,   0};
+
+void keyboard_handler() { // Called by assembly ISR
+  uint8_t scancode = inb(0x60);
+  if (!(scancode & 0x80) && scancode < 128) {
+    char c = scancode_to_ascii[scancode];
+    if (c) {
+      buffer[head] = c;
+      head = (head + 1) % 256;
+    }
+  }
+  outb(0x20, 0x20); // EOI to PIC
+}
 
 char getkey() {
-  uint8_t scancode = 0;
-  // keyboard controller status register
-  while (!(inb(0x64) & 1)) {
-  }
-  // keyboard data register
-  scancode = inb(0x60);
-
-  // if the scancode is a release code, return 0
-  if (scancode & 0x80)
-    return 0;
-  return scancode_to_ascii[scancode];
+  while (head == tail)
+    __asm__("hlt");
+  char c = buffer[tail];
+  tail = (tail + 1) % 256;
+  return c;
 }

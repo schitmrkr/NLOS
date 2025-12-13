@@ -1,4 +1,4 @@
-#include "../include/vga.h"
+#include "vga.h"
 #include <stdint.h>
 
 static volatile uint16_t *vga_buffer = (uint16_t *)VGA_ADDRESS;
