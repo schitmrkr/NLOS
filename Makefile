@@ -20,7 +20,7 @@ CFLAGS = -ffreestanding -fno-stack-protector -nostdlib -m32 -g
 LDFLAGS = -m elf_i386
 
 # Kernel source files
-KERNEL_SRC = kernel/kernel.c kernel/arch/x86/io.c kernel/vga.c kernel/utils.c kernel/print.c
+KERNEL_SRC = kernel/kernel.c kernel/arch/x86/io.c kernel/vga.c kernel/utils.c kernel/print.c drivers/keyboard.c
 KERNEL_OBJS = $(KERNEL_SRC:.c=.o)
 
 # Default target
@@ -38,10 +38,14 @@ boot.o: boot/boot.s
 kernel/%.o: kernel/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Compile driver C files
+drivers/%.o: drivers/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Run in QEMU (32-bit)
 run: kernel.elf
 	qemu-system-i386 -kernel kernel.elf -m 512M -serial stdio
 
 # Clean build artifacts
 clean:
-	rm -f *.o */arch/x86/*.o *.elf kernel/*.o
+	rm -f *.o */arch/x86/*.o *.elf kernel/*.o drivers/*.o

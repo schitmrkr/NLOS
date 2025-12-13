@@ -1,3 +1,4 @@
+#include "../drivers/keyboard.h"
 #include "../include/print.h"
 #include "../include/utils.h"
 #include "../include/vga.h"
@@ -23,5 +24,9 @@ void kmain(void) {
   kprintf("%d\n", 1234);
 
   while (1) {
+    char c = getkey();
+    if (c) {
+      vga_putchar(c);
+    }
   }
 }
